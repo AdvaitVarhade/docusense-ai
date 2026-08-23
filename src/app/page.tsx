@@ -8,11 +8,8 @@ import { SummaryViewer } from '@/components/SummaryViewer';
 import { ExtractionResult } from '@/domain/models/document';
 import { SummaryPreset, KeyPoint, ImprovementSuggestion } from '@/domain/models/summary';
 import {
-  Sparkles,
   FileText,
   Zap,
-  Layers,
-  Download,
   ShieldCheck,
   BookOpen,
 } from 'lucide-react';
@@ -137,54 +134,6 @@ export default function HomePage() {
             )}
           </div>
         </div>
-
-        {/* Feature Capabilities Grid */}
-        <section className="pt-8 border-t border-border space-y-6">
-          <h2 className="text-lg font-bold text-foreground text-center">
-            Engineered with Clean Hexagonal Architecture & Tri-Tier OCR
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-              <div className="p-2 w-fit rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <Zap className="h-5 w-5" />
-              </div>
-              <h3 className="font-semibold text-sm text-foreground">Tri-Engine Extraction</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Adaptive routing via unpdf (&lt;50ms), Gemini Flash Vision, and Tesseract.js WASM OCR.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-              <div className="p-2 w-fit rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
-                <Layers className="h-5 w-5" />
-              </div>
-              <h3 className="font-semibold text-sm text-foreground">Multi-Fidelity Summaries</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Seamlessly toggle between Short TL;DR, Medium Executive Synthesis, and Long Deep-Dive breakdowns.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-              <div className="p-2 w-fit rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <h3 className="font-semibold text-sm text-foreground">Improvement Critiques</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Evaluates clarity, logical structure, evidence completeness, and provides actionable recommendations.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-              <div className="p-2 w-fit rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                <Download className="h-5 w-5" />
-              </div>
-              <h3 className="font-semibold text-sm text-foreground">Multi-Format Export</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                1-click client-side export to Markdown (.md), formatted JSON (.json), clean text (.txt), and clipboard.
-              </p>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
