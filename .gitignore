@@ -1,0 +1,50 @@
+# Node dependencies
+node_modules/
+/.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Next.js build and cache
+.next/
+out/
+build/
+dist/
+
+# Environment variables
+.env
+.env*.local
+!.env.example
+
+# Vitest / Jest coverage
+coverage/
+.vitest/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# Operating System & IDE temp files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Agent metadata
+.agents/*
+!.agents/
+
+# Temporary test artifacts
+tests/fixtures/temp_*
