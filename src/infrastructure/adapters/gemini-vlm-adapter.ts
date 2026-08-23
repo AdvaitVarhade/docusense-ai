@@ -30,12 +30,15 @@ export class GeminiVlmAdapter implements DocumentExtractorPort {
     const defaults = [
       'gemini-2.5-flash',
       'gemini-2.0-flash',
+      'gemini-2.0-flash-lite',
       'gemini-1.5-flash-latest',
       'gemini-1.5-flash-002',
       'gemini-1.5-flash-001',
+      'gemini-1.5-flash-8b',
       'gemini-1.5-flash',
       'gemini-2.0-flash-exp',
       'gemini-1.5-pro',
+      'gemini-pro',
     ];
     const candidates = [customModel, this.verifiedModel, ...defaults].filter(
       (m): m is string => Boolean(m && m.trim().length > 0)
