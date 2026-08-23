@@ -8,7 +8,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   GEMINI_API_KEY: z.string().optional(),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),
-  GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
+  GEMINI_MODEL: z.string().default('gemini-3.6-flash'),
   GROQ_API_KEY: z.string().optional(),
   NEXT_PUBLIC_APP_NAME: z.string().default('DocuSense AI'),
   NEXT_PUBLIC_APP_URL: z.string().default('http://localhost:3000'),
