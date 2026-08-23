@@ -52,25 +52,7 @@ export default function HomePage() {
       <Navbar onResetAll={handleResetAll} hasActiveDocument={!!extractionResult} />
 
       {/* Main Dashboard Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-        {/* Hero Section */}
-        <section className="text-center space-y-4 max-w-3xl mx-auto pt-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>AI-Powered Document Intelligence & Streaming Engine</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground">
-            Transform Dense Documents into{' '}
-            <span className="bg-gradient-to-r from-primary to-violet-600 bg-clip-text text-transparent">
-              Actionable Intelligence
-            </span>
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Upload digital PDFs, scanned contracts, receipts, and images. Extract clean layout-aware text with
-            multi-tier OCR and stream smart multi-fidelity summaries with key takeaways in seconds.
-          </p>
-        </section>
-
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
         {/* Two-Column Responsive Working Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Extraction Workspace */}

@@ -393,14 +393,16 @@ export function SummaryViewer({
                 </button>
               )}
 
-              <button
-                type="button"
-                onClick={startSummarization}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm shadow-primary/20 cursor-pointer"
-              >
-                {summaryMarkdown ? <RotateCcw className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
-                {summaryMarkdown ? 'Regenerate' : 'Generate Summary'}
-              </button>
+              {summaryMarkdown && (
+                <button
+                  type="button"
+                  onClick={startSummarization}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm shadow-primary/20 cursor-pointer"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Regenerate
+                </button>
+              )}
             </>
           )}
         </div>
