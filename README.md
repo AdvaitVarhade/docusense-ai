@@ -10,12 +10,12 @@
 
 **DocuSense AI** is a production-grade full-stack web application designed for intelligent document ingestion, multi-tier layout-aware OCR extraction, and real-time Server-Sent Events (SSE) AI summarization with actionable improvement critiques.
 
-- 🌐 **Live Web Application**: [https://docusense-ai-app.netlify.app](https://docusense-ai-app.netlify.app)
-- 📦 **GitHub Repository**: [https://github.com/AdvaitVarhade/docusense-ai](https://github.com/AdvaitVarhade/docusense-ai)
+- **Live Web Application**: [https://docusense-ai-app.netlify.app](https://docusense-ai-app.netlify.app)
+- **GitHub Repository**: [https://github.com/AdvaitVarhade/docusense-ai](https://github.com/AdvaitVarhade/docusense-ai)
 
 ---
 
-## 📑 Repository & Documentation Index
+## Repository & Documentation Index
 
 - **Live Application URL**: [https://docusense-ai-app.netlify.app](https://docusense-ai-app.netlify.app)
 - **GitHub Repository**: [https://github.com/AdvaitVarhade/docusense-ai](https://github.com/AdvaitVarhade/docusense-ai)
@@ -36,7 +36,7 @@
 
 ---
 
-## 🌟 Core Capabilities
+## Core Capabilities
 
 ### 1. Tri-Engine Adaptive Document Extraction
 - **Tier 1 (Digital PDF Parser)**: High-speed in-memory text and layout extraction via WebAssembly (`unpdf`) in $< 50\text{ms}$ with zero AI token cost.
@@ -61,7 +61,7 @@
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
@@ -98,7 +98,7 @@ flowchart TD
 
 ---
 
-## 🚀 Quickstart & Installation
+## Quickstart & Installation
 
 ### Prerequisites
 - Node.js 18.x / 20.x / 22.x
@@ -137,9 +137,9 @@ npm run start
 
 ---
 
-## 🧪 Verification & Test Suite
+## Verification & Test Suite
 
-The repository includes an exhaustive test harness covering 9 test suites and 90 test cases:
+The repository includes an exhaustive test harness covering 11 test suites and 97 test cases:
 
 ```bash
 # Run all Vitest unit and end-to-end suites
@@ -157,5 +157,5 @@ npm test
 
 ---
 
-## 📜 License
+## License
 MIT License. Created by [Advait Varhade](https://github.com/AdvaitVarhade).
