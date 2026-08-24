@@ -17,6 +17,7 @@ Built for the **Software Engineering Assessment Project**, DocuSense AI couples 
 
 - **GitHub Repository**: [https://github.com/AdvaitVarhade/docusense-ai](https://github.com/AdvaitVarhade/docusense-ai)
 - **Technical Architecture Specification (46-Section Blueprint)**: [`docs/ARCHITECTURE.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/ARCHITECTURE.md)
+- **Comprehensive UML & System Diagrams (All 8 Models)**: [`docs/SYSTEM_DIAGRAMS.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/SYSTEM_DIAGRAMS.md)
 - **IEEE Software Requirements Specification (SRS)**: [`docs/IEEE_SRS_Document.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/IEEE_SRS_Document.md)
 - **Product Requirements Document (PRD)**: [`docs/prd/PRD-Document-Summary-Assistant.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/prd/PRD-Document-Summary-Assistant.md)
 - **200-Word Approach Write-Up**: [`docs/APPROACH_SUMMARY.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/APPROACH_SUMMARY.md)

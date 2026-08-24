@@ -180,10 +180,12 @@ To prevent adversarial prompt injections (e.g. documents containing phrases like
 
 ## 12. Deliverable & Links
 - **GitHub Repository**: [https://github.com/AdvaitVarhade/docusense-ai](https://github.com/AdvaitVarhade/docusense-ai)
+- **Comprehensive System Diagrams (All 8 Models)**: [`docs/SYSTEM_DIAGRAMS.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/SYSTEM_DIAGRAMS.md)
+- **IEEE Software Requirements Specification (SRS)**: [`docs/IEEE_SRS_Document.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/IEEE_SRS_Document.md)
 - **Documentation**:
-  - PRD: [`docs/prd/PRD-Document-Summary-Assistant.md`](file:///c:/d_drive/projects/Unthinkable/docs/prd/PRD-Document-Summary-Assistant.md)
-  - 200-Word Approach Write-Up: [`docs/APPROACH_SUMMARY.md`](file:///c:/d_drive/projects/Unthinkable/docs/APPROACH_SUMMARY.md)
-  - ADR-001 (Tech Stack): [`docs/adr/ADR-001-Tech-Stack-Selection.md`](file:///c:/d_drive/projects/Unthinkable/docs/adr/ADR-001-Tech-Stack-Selection.md)
-  - ADR-002 (Extraction Pipeline): [`docs/adr/ADR-002-Document-Extraction-Strategy.md`](file:///c:/d_drive/projects/Unthinkable/docs/adr/ADR-002-Document-Extraction-Strategy.md)
-  - ADR-003 (AI Model Routing): [`docs/adr/ADR-003-AI-Model-Routing-and-Streaming.md`](file:///c:/d_drive/projects/Unthinkable/docs/adr/ADR-003-AI-Model-Routing-and-Streaming.md)
-  - Defect Log: [`docs/BUG_LOG.md`](file:///c:/d_drive/projects/Unthinkable/docs/BUG_LOG.md)
+  - PRD: [`docs/prd/PRD-Document-Summary-Assistant.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/prd/PRD-Document-Summary-Assistant.md)
+  - 200-Word Approach Write-Up: [`docs/APPROACH_SUMMARY.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/APPROACH_SUMMARY.md)
+  - ADR-001 (Tech Stack): [`docs/adr/ADR-001-Tech-Stack-Selection.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/adr/ADR-001-Tech-Stack-Selection.md)
+  - ADR-002 (Extraction Pipeline): [`docs/adr/ADR-002-Document-Extraction-Strategy.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/adr/ADR-002-Document-Extraction-Strategy.md)
+  - ADR-003 (AI Model Routing): [`docs/adr/ADR-003-AI-Model-Routing-and-Streaming.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/adr/ADR-003-AI-Model-Routing-and-Streaming.md)
+  - Defect Log: [`docs/BUG_LOG.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/BUG_LOG.md)
