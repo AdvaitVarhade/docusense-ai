@@ -17,9 +17,11 @@ Built for the **Software Engineering Assessment Project**, DocuSense AI couples 
 
 - **GitHub Repository**: [https://github.com/AdvaitVarhade/docusense-ai](https://github.com/AdvaitVarhade/docusense-ai)
 - **Technical Architecture Specification (46-Section Blueprint)**: [`docs/ARCHITECTURE.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/ARCHITECTURE.md)
+- **IEEE Software Requirements Specification (SRS)**: [`docs/IEEE_SRS_Document.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/IEEE_SRS_Document.md)
 - **Product Requirements Document (PRD)**: [`docs/prd/PRD-Document-Summary-Assistant.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/prd/PRD-Document-Summary-Assistant.md)
 - **200-Word Approach Write-Up**: [`docs/APPROACH_SUMMARY.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/APPROACH_SUMMARY.md)
 - **Compiled PDF Documents**:
+  - [IEEE SRS Specification PDF](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/IEEE_SRS_Document.pdf)
   - [Technical Architecture PDF](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/DocuSense_Technical_Architecture.pdf)
   - [Approach Summary PDF](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/DocuSense_Approach_Writeup.pdf)
 - **Architecture Decision Records (ADRs)**:

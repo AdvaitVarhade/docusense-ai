@@ -1,0 +1,118 @@
+\documentclass[10pt,twocolumn,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{titlesec}
+
+\titleformat{\section}{\large\bfseries\scshape}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdftitle={DocuSense AI - IEEE Software Requirements Specification},
+}
+
+\title{\textbf{Software Requirements Specification (SRS)}\\\large Document Summary Assistant (DocuSense AI)\\\normalsize IEEE Std 830-1998 / ISO/IEC/IEEE 29148 Compliant Specification}
+
+\author{\textbf{Advait Varhade}\\
+\textit{Software Engineering Team}\\
+GitHub Repository: \url{https://github.com/AdvaitVarhade/docusense-ai}}
+\date{August 24, 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\textbf{\textit{Abstract}---This Software Requirements Specification (SRS) establishes the formal engineering requirements for \textbf{DocuSense AI}, an intelligent full-stack document intelligence and summarization platform. Engineered using a \textbf{Hexagonal (Ports \& Adapters) Architecture} on Next.js 15 App Router, TypeScript, and Tailwind CSS, the system incorporates a Tri-Tier Adaptive OCR extraction pipeline and real-time Server-Sent Events (SSE) AI synthesis with an inside-stream multi-model fallback chain. This document details the functional, non-functional, interface, and security requirements, concluding with a day-wise phased execution timeline spanning August 19, 2026 to August 24, 2026.}
+\end{abstract}
+
+\paragraph{Keywords}
+Software Requirements Specification, IEEE 830, Next.js 15, Hexagonal Architecture, Document Intelligence, Tri-Tier OCR, SSE Streaming, LLM Fallback Chain.
+
+\section{Introduction}
+This document specifies the software requirements for DocuSense AI in compliance with the IEEE Std 830-1998 standard.
+
+\subsection{Purpose \& Scope}
+DocuSense AI ingests heterogeneous digital PDFs, scanned contracts, receipts, and images, performs layout-aware text extraction via WebAssembly and Optical Character Recognition (OCR), and generates multi-fidelity streaming summaries (\textit{Short}, \textit{Medium}, \textit{Long}) paired with highlighted key takeaways and actionable improvement critiques.
+
+\section{Overall System Description}
+
+\subsection{Hexagonal Clean Architecture}
+The system enforces strict decoupling across four primary layers:
+\begin{itemize}[noitemsep]
+    \item \textbf{Domain Layer (\texttt{src/domain/})}: Pure business entities, Zod validation schemas, and port interfaces (\texttt{IExtractionEngine}, \texttt{ISummarizationEngine}).
+    \item \textbf{Application Layer (\texttt{src/application/})}: Orchestration use-cases (\texttt{ExtractDocumentUseCase}, \texttt{SummarizeDocumentUseCase}) and domain services.
+    \item \textbf{Infrastructure Layer (\texttt{src/infrastructure/})}: Concrete external adapters for \texttt{unpdf} (WASM PDF), \texttt{tesseract.js} (WASM OCR), Gemini 3.x APIs, and offline mock engines.
+    \item \textbf{Presentation Layer (\texttt{src/components/})}: Next.js 15 UI and Server-Sent Events (SSE) route handlers.
+\end{itemize}
+
+\section{Functional Requirements}
+
+\subsection{Ingestion \& Tri-Tier Extraction (FR-1 \& FR-2)}
+\begin{itemize}[noitemsep]
+    \item \textbf{FR-1.1}: Accepts PDF, PNG, JPG, JPEG, WEBP, and TIFF up to 25MB via drag-and-drop or file picker.
+    \item \textbf{FR-2.1 (Digital PDF)}: Executes in-memory \texttt{unpdf} WebAssembly parsing in $< 50\text{ms}$ with zero AI token cost.
+    \item \textbf{FR-2.2 (Scanned Image OCR)}: Executes sandboxed \texttt{tesseract.js} WebAssembly OCR locally with zero external API calls.
+    \item \textbf{FR-2.3 (Telemetry)}: Automatically computes word count, character count, estimated reading time, and confidence metrics.
+\end{itemize}
+
+\subsection{AI Summarization \& Streaming (FR-3 \& FR-4)}
+\begin{itemize}[noitemsep]
+    \item \textbf{FR-3.1 (Multi-Fidelity Presets)}: Supports Short ($\sim$150w TL;DR), Medium ($\sim$400w Thematic Synthesis), and Long ($\sim$900w Deep-Dive) modes.
+    \item \textbf{FR-4.1 (SSE Streaming)}: Streams tokens in real-time over HTTP Server-Sent Events with $< 450\text{ms}$ Time-to-First-Token.
+    \item \textbf{FR-4.2 (Stop Control)}: Enables immediate user cancellation via AbortController.
+\end{itemize}
+
+\subsection{Takeaways, Critiques \& Export Suite (FR-5 \& FR-6)}
+\begin{itemize}[noitemsep]
+    \item \textbf{FR-5.1}: Extracts categorized Key Takeaways (\textit{metric}, \textit{strategic}, \textit{operational}, \textit{risk}).
+    \item \textbf{FR-5.2}: Generates categorized Improvement Critiques (\textit{clarity}, \textit{structure}, \textit{completeness}, \textit{actionable}).
+    \item \textbf{FR-6.1}: Provides 1-click client-side export to Markdown (\texttt{.md}), formatted JSON (\texttt{.json}), clean text (\texttt{.txt}), and system clipboard.
+\end{itemize}
+
+\section{Non-Functional Requirements (NFRs)}
+\begin{itemize}[noitemsep]
+    \item \textbf{NFR-1 (Performance)}: Time-to-First-Token $< 450\text{ms}$; PDF extraction $< 100\text{ms}$; Shared First Load JS $< 110\text{kB}$.
+    \item \textbf{NFR-2 (Security)}: All raw inputs enclosed within strict \texttt{<document\_content>} XML barriers; output markdown sanitized via \texttt{rehype-sanitize}.
+    \item \textbf{NFR-3 (Privacy)}: In-memory ephemeral processing with zero persistent disk storage.
+    \item \textbf{NFR-4 (Reliability)}: Inside-stream fallback loop (\texttt{gemini-3.6-flash} $\rightarrow$ \texttt{gemini-3.5-flash-lite} $\rightarrow$ \texttt{mock\_offline\_engine}) ensuring zero unhandled crashes.
+\end{itemize}
+
+\section{Project Timeline \& Phased Implementation Plan\\(August 19 -- August 24, 2026)}
+
+The project was executed in a 6-day phased development lifecycle from August 19 to August 24, 2026:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\columnwidth}{@{}lX@{}}
+\toprule
+\textbf{Date} & \textbf{Phase Scope \& Key Deliverables} \\ \midrule
+\textbf{Aug 19} & \textbf{Phase 1: Architecture \& Foundation}\\
+& Formulated PRD, authored ADR-001/002/003, scaffolded Next.js 15 Hexagonal architecture. \\ \addlinespace
+\textbf{Aug 20} & \textbf{Phase 2: Ingestion \& Tri-Tier OCR Pipeline}\\
+& Implemented \texttt{/api/extract}, \texttt{unpdf} WASM parser, \texttt{tesseract.js} OCR, and \texttt{DocumentUploader.tsx}. \\ \addlinespace
+\textbf{Aug 21} & \textbf{Phase 3: AI Engine \& SSE Streaming}\\
+& Implemented \texttt{/api/summarize} SSE endpoint, prompt injection shields, and multi-fidelity presets. \\ \addlinespace
+\textbf{Aug 22} & \textbf{Phase 4: Dashboard UI \& Export Suite}\\
+& Built \texttt{SummaryViewer.tsx}, length switcher, and 4-format client-side export suite (\texttt{.md}, \texttt{.json}, \texttt{.txt}, clipboard). \\ \addlinespace
+\textbf{Aug 23} & \textbf{Phase 5: Multi-Model Chain \& Resilience}\\
+& Configured Gemini 3.x fallback routing (\texttt{gemini-3.6-flash}, \texttt{gemini-3.5-flash-lite}), stream catchers, and bug fixes. \\ \addlinespace
+\textbf{Aug 24} & \textbf{Phase 6: Full Verification \& Public Release}\\
+& 90/90 Vitest tests passed (100\%), compiled IEEE SRS specification, and deployed to GitHub repository. \\ \bottomrule
+\end{tabularx}
+\caption{Day-Wise Chronological Development Schedule}
+\end{table}
+
+\section{Verification Results}
+The application achieved a \textbf{100\% pass rate} across 9 automated test suites and 90 unit/e2e test cases in Vitest. Production build compiled cleanly with zero errors.
+
+\end{document}
