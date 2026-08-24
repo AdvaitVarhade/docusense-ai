@@ -1,20 +1,23 @@
 # DocuSense AI — Intelligent Document Summary & Critique Assistant
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Netlify-00C7B7?style=flat-square&logo=netlify)](https://docusense-ai-app.netlify.app)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-90%2F90%20Passed-emerald?style=flat-square)](https://github.com/AdvaitVarhade/docusense-ai)
+[![Tests](https://img.shields.io/badge/Tests-100%2F100%20Passed-emerald?style=flat-square)](https://github.com/AdvaitVarhade/docusense-ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
 **DocuSense AI** is a production-grade full-stack web application designed for intelligent document ingestion, multi-tier layout-aware OCR extraction, and real-time Server-Sent Events (SSE) AI summarization with actionable improvement critiques.
 
-Built for the **Software Engineering Assessment Project**, DocuSense AI couples a **Hexagonal (Ports & Adapters) Architecture** with an adaptive extraction pipeline and multi-model Gemini 3.x fallback routing under a strict zero-cost free-tier operational model.
+- 🌐 **Live Web Application**: [https://docusense-ai-app.netlify.app](https://docusense-ai-app.netlify.app)
+- 📦 **GitHub Repository**: [https://github.com/AdvaitVarhade/docusense-ai](https://github.com/AdvaitVarhade/docusense-ai)
 
 ---
 
 ## 📑 Repository & Documentation Index
 
+- **Live Application URL**: [https://docusense-ai-app.netlify.app](https://docusense-ai-app.netlify.app)
 - **GitHub Repository**: [https://github.com/AdvaitVarhade/docusense-ai](https://github.com/AdvaitVarhade/docusense-ai)
 - **Technical Architecture Specification (46-Section Blueprint)**: [`docs/ARCHITECTURE.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/ARCHITECTURE.md)
 - **Comprehensive UML & System Diagrams (All 8 Models)**: [`docs/SYSTEM_DIAGRAMS.md`](https://github.com/AdvaitVarhade/docusense-ai/blob/main/docs/SYSTEM_DIAGRAMS.md)

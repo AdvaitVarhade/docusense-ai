@@ -53,3 +53,6 @@ Thumbs.db
 tests/fixtures/temp_*
 test-results/
 playwright-report/
+
+# Local Netlify folder
+.netlify
