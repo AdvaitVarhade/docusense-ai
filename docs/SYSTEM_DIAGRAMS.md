@@ -704,57 +704,51 @@ sequenceDiagram
     participant Model35 as Gemini 3.5 Flash Lite
     participant Mock as MockSummarizerAdapter
 
-    User->>UI: Select Preset (Short/Med/Long) & Persona (Legal/Fin/Acad/Exec)
+    User->>UI: Select Preset and Persona (Legal, Financial, Academic, Executive)
     User->>UI: Click "Start AI Summarization Stream"
-    UI->>Route: POST /api/summarize {text, length, persona, extractKeyPoints, extractSuggestions}
+    UI->>Route: POST /api/summarize (text, length, persona, flags)
     
     Route->>Route: Validate Schema via Zod (SummarizeRequestSchema)
     Route->>UC: executeStream(summarizationOptions)
     UC->>PromptSvc: buildSummarizationPrompt(options)
-    PromptSvc->>PromptSvc: Inject Persona Directives & Enclose text in <document_content> XML
+    PromptSvc->>PromptSvc: Inject Persona Directives and XML Delimiters
     PromptSvc-->>UC: Return Sanitized LLM Prompt
     
     UC->>Adapter: streamSummary(options)
-    Adapter->>Adapter: Instantiate ReadableStream with Candidate Model Fallback Loop
+    Adapter->>Adapter: Create ReadableStream with Model Fallback Loop
     
-    Route-->>UI: 200 OK (Content-Type: text/event-stream; charset=utf-8)
+    Route-->>UI: 200 OK (text/event-stream)
     
-    loop Stream Generation Iteration
-        alt Try Primary Model: gemini-3.6-flash
-            Adapter->>Model36: generateContentStream({contents: [{text: prompt}]})
-            alt Model Active & Generating
-                loop Token Streaming
-                    Model36-->>Adapter: Stream Text Token Chunk
-                    Adapter-->>Route: Enqueue SSE payload `data: {"chunk": "..."}\n\n`
-                    Route-->>UI: Forward SSE Event Chunk
-                    UI->>UI: Incrementally render Markdown via react-markdown
-                end
-            else Model Deprecated / 404 / 503 Rate Limit Error
-                Model36-->>Adapter: Catch 404/503 Inside-Stream Exception
-                Adapter->>Adapter: Log Warning: 'gemini-3.6-flash' failed. Trying 'gemini-3.5-flash-lite'...
-                Adapter->>Model35: generateContentStream({contents: [{text: prompt}]})
-                loop Token Streaming from Fallback Model
-                    Model35-->>Adapter: Stream Text Token Chunk
-                    Adapter-->>Route: Enqueue SSE payload `data: {"chunk": "..."}\n\n`
-                    Route-->>UI: Forward SSE Event Chunk
-                    UI->>UI: Incrementally render Markdown
-                end
-            end
-        else All Cloud Models Unavailable (Offline / Quota Depleted)
-            Adapter->>Mock: streamSummary(options)
-            loop Deterministic Heuristic Tokens
-                Mock-->>Adapter: Stream Chunk
-                Adapter-->>Route: Enqueue SSE payload
-                Route-->>UI: Forward SSE Event Chunk
-            end
+    alt Primary Model Available (gemini-3.6-flash)
+        Adapter->>Model36: generateContentStream(prompt)
+        loop Token Stream Chunk Iteration
+            Model36-->>Adapter: Stream Text Token Chunk
+            Adapter-->>Route: Enqueue SSE payload data chunk
+            Route-->>UI: Forward SSE Event Chunk
+            UI->>UI: Incrementally render Markdown
+        end
+    else Deprecation 404 or Quota 503 Fallback (gemini-3.5-flash-lite)
+        Adapter->>Model35: generateContentStream(prompt)
+        loop Fallback Token Stream Iteration
+            Model35-->>Adapter: Stream Text Token Chunk
+            Adapter-->>Route: Enqueue SSE payload data chunk
+            Route-->>UI: Forward SSE Event Chunk
+            UI->>UI: Incrementally render Markdown
+        end
+    else All Cloud Models Offline (Mock Fallback)
+        Adapter->>Mock: streamSummary(options)
+        loop Offline Heuristic Tokens
+            Mock-->>Adapter: Stream Deterministic Token Chunk
+            Adapter-->>Route: Enqueue SSE payload data chunk
+            Route-->>UI: Forward SSE Event Chunk
         end
     end
 
-    Adapter-->>Route: Enqueue `data: [DONE]\n\n` & Close Stream Controller
+    Adapter-->>Route: Enqueue data: DONE signal and Close Stream
     Route-->>UI: Close SSE Connection
-    UI->>UI: Extract Structured Key Takeaways & Improvement Suggestions
-    UI->>UI: Auto-save Analysis into Local HistoryStorage
-    UI->>User: Display Completed Summary with Audio Player & Export Menu
+    UI->>UI: Extract Structured Key Takeaways and Critiques
+    UI->>UI: Auto-save Analysis into Local History Vault
+    UI->>User: Display Completed Summary with Audio Player and Export Menu
 ```
 
 ---
@@ -775,29 +769,29 @@ sequenceDiagram
     User->>ChatUI: Type question (e.g. "What are the primary liabilities?")
     User->>ChatUI: Click "Ask" or press Enter
     ChatUI->>ChatUI: Append User Message to UI State
-    ChatUI->>Route: POST /api/chat {documentText, question, history}
+    ChatUI->>Route: POST /api/chat (documentText, question, history)
     
     Route->>Route: Validate Schema via Zod (chatRequestSchema)
     Route->>UC: executeStream(chatOptions)
     UC->>PromptSvc: buildChatPrompt(chatOptions)
-    PromptSvc->>PromptSvc: Format conversation history & wrap doc in <document_content>
+    PromptSvc->>PromptSvc: Format conversation history and wrap doc in XML
     PromptSvc-->>UC: Return Isolated Q&A Prompt
     
     UC->>Adapter: streamChat(chatOptions)
-    Route-->>ChatUI: 200 OK (Content-Type: text/event-stream)
+    Route-->>ChatUI: 200 OK (text/event-stream)
     
     Adapter->>GeminiAPI: generateContentStream(isolatedPrompt)
     
     loop Stream Q&A Response Tokens
         GeminiAPI-->>Adapter: Yield Token Chunk
-        Adapter-->>Route: Enqueue `data: {"chunk": "..."}\n\n`
+        Adapter-->>Route: Enqueue SSE chunk payload
         Route-->>ChatUI: Forward SSE Event Chunk
-        ChatUI->>ChatUI: Dynamically render Markdown bubble in real-time
+        ChatUI->>ChatUI: Dynamically render Markdown bubble
     end
 
-    Adapter-->>Route: Enqueue `data: [DONE]\n\n`
+    Adapter-->>Route: Enqueue data: DONE signal
     Route-->>ChatUI: Close SSE Connection
-    ChatUI->>ChatUI: Append Assistant Message to Conversation History
+    ChatUI->>ChatUI: Append Assistant Message to History
     ChatUI->>User: Display completed answer bubble with code/markdown formatting
 ```
 
@@ -922,40 +916,40 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    StartStream([Initialize /api/summarize SSE Stream]) --> BuildPrompt[Build Sanitized Prompt with XML Barriers]
-    BuildPrompt --> InitController[Instantiate ReadableStream controller]
+    StartStream([Initialize /api/summarize SSE Stream]) --> BuildPrompt["Build Sanitized Prompt with XML Barriers"]
+    BuildPrompt --> InitController["Instantiate ReadableStream controller"]
     
-    InitController --> TryModel1[Try Primary Model: gemini-3.6-flash]
+    InitController --> TryModel1["Try Primary Model: gemini-3.6-flash"]
     
     TryModel1 --> ExecModel1{generateContentStream Iterator}
     
-    ExecModel1 -->|Success: Yielding Chunks| StreamChunk1[Enqueue SSE payload `data: chunk`]
+    ExecModel1 -->|Success: Yielding Chunks| StreamChunk1["Enqueue SSE payload data chunk"]
     StreamChunk1 --> CheckNextChunk1{More Chunks?}
     CheckNextChunk1 -->|Yes| StreamChunk1
-    CheckNextChunk1 -->|No| CloseSuccess[Enqueue `data: [DONE]` & Close Controller]
+    CheckNextChunk1 -->|No| CloseSuccess["Enqueue data: DONE and Close Controller"]
     
-    ExecModel1 -->|404 Retired / 503 Quota Error| LogWarn1[Log Warning: Model 1 Unavailable]
-    LogWarn1 --> TryModel2[Try Fast Fallback: gemini-3.5-flash-lite]
+    ExecModel1 -->|404 Retired / 503 Quota Error| LogWarn1["Log Warning: Model 1 Unavailable"]
+    LogWarn1 --> TryModel2["Try Fast Fallback: gemini-3.5-flash-lite"]
     
     TryModel2 --> ExecModel2{generateContentStream Iterator}
-    ExecModel2 -->|Success: Yielding Chunks| StreamChunk2[Enqueue SSE payload `data: chunk`]
+    ExecModel2 -->|Success: Yielding Chunks| StreamChunk2["Enqueue SSE payload data chunk"]
     StreamChunk2 --> CheckNextChunk2{More Chunks?}
     CheckNextChunk2 -->|Yes| StreamChunk2
     CheckNextChunk2 -->|No| CloseSuccess
     
-    ExecModel2 -->|404 / 503 Error| LogWarn2[Log Warning: Model 2 Unavailable]
-    LogWarn2 --> TryModel3[Try Standard Fallback: gemini-3.0-flash]
+    ExecModel2 -->|404 / 503 Error| LogWarn2["Log Warning: Model 2 Unavailable"]
+    LogWarn2 --> TryModel3["Try Standard Fallback: gemini-3.0-flash"]
     
     TryModel3 --> ExecModel3{generateContentStream Iterator}
-    ExecModel3 -->|Success: Yielding Chunks| StreamChunk3[Enqueue SSE payload `data: chunk`]
+    ExecModel3 -->|Success: Yielding Chunks| StreamChunk3["Enqueue SSE payload data chunk"]
     StreamChunk3 --> CheckNextChunk3{More Chunks?}
     CheckNextChunk3 -->|Yes| StreamChunk3
     CheckNextChunk3 -->|No| CloseSuccess
     
-    ExecModel3 -->|All Gemini Models Failed / Offline| LogWarnMock[Log Warning: Switching to Mock Heuristic Engine]
-    LogWarnMock --> RunMock[Execute MockSummarizerAdapter Heuristics]
+    ExecModel3 -->|All Gemini Models Failed / Offline| LogWarnMock["Log Warning: Switch to Mock Heuristic Engine"]
+    LogWarnMock --> RunMock["Execute MockSummarizerAdapter Heuristics"]
     
-    RunMock --> StreamMockChunks[Stream Contextual Deterministic Token Chunks]
+    RunMock --> StreamMockChunks["Stream Contextual Deterministic Token Chunks"]
     StreamMockChunks --> CloseSuccess
     
     CloseSuccess --> EndStream([Stream Complete & Closed])
