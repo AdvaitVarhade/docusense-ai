@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import {
   UploadCloud,
   FileText,
@@ -17,6 +17,9 @@ import {
   FileCode,
   Sparkles,
   Loader2,
+  Search,
+  CheckCircle2,
+  FileCheck2,
 } from 'lucide-react';
 import { ExtractionResult } from '@/domain/models/document';
 import { toast } from 'sonner';
@@ -59,6 +62,7 @@ export function DocumentUploader({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState<boolean>(true);
   const [copied, setCopied] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -217,6 +221,7 @@ export function DocumentUploader({
     setProgress(0);
     setProgressStatus('');
     setIsExtracting(false);
+    setSearchQuery('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -262,6 +267,18 @@ export function DocumentUploader({
   const engine = metadata?.extractionEngine || 'unpdf';
   const readingTime = metadata?.readingTimeMinutes || Math.max(1, Math.ceil(wordCount / 200));
 
+  // Search in preview
+  const searchMatchesCount = useMemo(() => {
+    if (!searchQuery.trim() || !extractionResult?.text) return 0;
+    try {
+      const regex = new RegExp(searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      const matches = extractionResult.text.match(regex);
+      return matches ? matches.length : 0;
+    } catch {
+      return 0;
+    }
+  }, [searchQuery, extractionResult?.text]);
+
   return (
     <div className={`w-full space-y-4 ${className}`}>
       {/* Hidden Native File Input */}
@@ -290,59 +307,77 @@ export function DocumentUploader({
               fileInputRef.current?.click();
             }
           }}
-          className={`relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-200 cursor-pointer ${
+          className={`relative overflow-hidden flex flex-col items-center justify-center rounded-3xl border-2 border-dashed p-8 md:p-10 text-center transition-all duration-300 cursor-pointer ${
             isDragOver
-              ? 'border-primary bg-primary/5 scale-[1.01] shadow-lg'
-              : 'border-border bg-card/50 hover:border-primary/50 hover:bg-card/80'
+              ? 'border-emerald-500 bg-emerald-500/10 scale-[1.01] shadow-xl shadow-emerald-500/10 ring-4 ring-emerald-500/20'
+              : 'border-border/80 bg-card/60 hover:border-emerald-500/50 hover:bg-card/90 shadow-sm'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${
-            isExtracting ? 'cursor-wait border-primary/40 bg-muted/30' : ''
+            isExtracting ? 'cursor-wait border-emerald-500/40 bg-card/80' : ''
           }`}
         >
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute inset-0 bg-radial from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
+
           {isExtracting ? (
             /* Uploading / Extracting Spinner & Multi-stage Progress */
-            <div className="w-full max-w-md space-y-4 py-4">
+            <div className="relative z-10 w-full max-w-md space-y-5 py-4">
               <div className="flex items-center justify-center gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="font-semibold text-lg text-foreground">Processing Document...</span>
+                <div className="relative">
+                  <div className="h-10 w-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 animate-pulse">
+                    <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
+                  </div>
+                </div>
+                <div className="text-left">
+                  <h4 className="font-bold text-base text-foreground">Processing Document...</h4>
+                  <p className="text-xs text-muted-foreground font-mono">{progressStatus}</p>
+                </div>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden border border-border">
-                <div
-                  className="bg-primary h-2.5 rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-
-              <div className="flex justify-between items-center text-xs text-muted-foreground">
-                <span className="font-medium">{progressStatus}</span>
-                <span className="font-mono font-semibold">{progress}%</span>
+              <div className="space-y-2">
+                <div className="w-full bg-muted/80 rounded-full h-2.5 overflow-hidden border border-border/80 p-0.5">
+                  <div
+                    className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 h-1.5 rounded-full transition-all duration-300 ease-out shadow-xs"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <div className="flex justify-between items-center text-xs text-muted-foreground">
+                  <span className="font-medium flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-emerald-500" />
+                    In-Memory Pipeline
+                  </span>
+                  <span className="font-mono font-bold text-foreground">{progress}%</span>
+                </div>
               </div>
 
               {selectedFile && (
-                <p className="text-xs text-muted-foreground font-mono truncate">
-                  {selectedFile.name} ({formatBytes(selectedFile.size)})
-                </p>
+                <div className="px-3 py-2 rounded-xl bg-muted/40 border border-border/60 text-xs text-muted-foreground font-mono truncate flex items-center justify-center gap-2">
+                  <FileCheck2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                  <span className="truncate">{selectedFile.name}</span>
+                  <span className="shrink-0 text-muted-foreground/70">({formatBytes(selectedFile.size)})</span>
+                </div>
               )}
             </div>
           ) : (
             /* Idle Dropzone Call to Action */
-            <div className="flex flex-col items-center space-y-4">
-              <div className="p-4 rounded-full bg-primary/10 text-primary border border-primary/20 shadow-sm transition-transform hover:scale-105">
+            <div className="relative z-10 flex flex-col items-center space-y-4 max-w-lg">
+              <div className="relative p-4 rounded-3xl bg-gradient-to-tr from-emerald-500/15 via-teal-500/10 to-cyan-500/5 text-emerald-500 border border-emerald-500/25 shadow-md shadow-emerald-500/10 transition-transform duration-300 hover:scale-110">
                 <UploadCloud className="h-10 w-10" />
               </div>
-              <div className="space-y-1">
-                <h3 className="font-semibold text-base md:text-lg text-foreground">
-                  Drag & drop your document here, or <span className="text-primary underline">browse</span>
+              <div className="space-y-1.5">
+                <h3 className="font-bold text-lg text-foreground tracking-tight">
+                  Drag & drop your document here, or <span className="text-emerald-500 underline underline-offset-4 decoration-emerald-500/40 hover:decoration-emerald-500">browse</span>
                 </h3>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  Supports Digital PDFs, Scanned PDFs, Images (PNG, JPG, WEBP), and Plain Text
+                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                  Fast in-memory parsing for digital PDFs, scanned receipts, contracts, and images
                 </p>
               </div>
-              <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-[11px] text-muted-foreground">
-                <span className="px-2.5 py-1 rounded-full bg-muted border border-border">Max: 25 MB</span>
-                <span className="px-2.5 py-1 rounded-full bg-muted border border-border">Fast In-Memory Extraction</span>
-                <span className="px-2.5 py-1 rounded-full bg-muted border border-border">Multi-Tier OCR</span>
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-[11px] font-medium text-muted-foreground">
+                <span className="px-3 py-1 rounded-full bg-card border border-border/80 shadow-2xs">PDF, PNG, JPG, WEBP, TXT</span>
+                <span className="px-3 py-1 rounded-full bg-card border border-border/80 shadow-2xs">Max: 25 MB</span>
+                <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-2xs flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> Tri-Tier OCR
+                </span>
               </div>
             </div>
           )}
@@ -351,7 +386,7 @@ export function DocumentUploader({
 
       {/* State 2: Error Alert Banner */}
       {errorMessage && (
-        <div className="flex items-start justify-between rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-destructive animate-in fade-in duration-200">
+        <div className="flex items-start justify-between rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-destructive animate-in fade-in duration-200 shadow-sm">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
             <div className="space-y-1">
@@ -363,7 +398,7 @@ export function DocumentUploader({
             {selectedFile && (
               <button
                 onClick={handleRetry}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors shadow-sm"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors shadow-sm cursor-pointer"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Retry
@@ -371,7 +406,7 @@ export function DocumentUploader({
             )}
             <button
               onClick={() => setErrorMessage(null)}
-              className="p-1 rounded-md hover:bg-destructive/20 transition-colors"
+              className="p-1 rounded-lg hover:bg-destructive/20 transition-colors cursor-pointer"
               aria-label="Dismiss error"
             >
               <X className="h-4 w-4" />
@@ -382,11 +417,11 @@ export function DocumentUploader({
 
       {/* State 3: Extraction Result Card & Metadata Inspection */}
       {extractionResult && (
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-5 animate-in fade-in duration-300">
+        <div className="rounded-3xl border border-border/80 bg-card/80 backdrop-blur-md p-6 shadow-sm space-y-5 animate-in fade-in duration-300">
           {/* Header Row: File Identity & Actions */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border/60">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-2xs">
                 {selectedFile?.type.includes('image') || metadata?.mimeType.includes('image') ? (
                   <ImageIcon className="h-6 w-6" />
                 ) : (
@@ -394,11 +429,11 @@ export function DocumentUploader({
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-base text-foreground leading-tight">
+                <h3 className="font-bold text-base text-foreground leading-tight">
                   {(metadata as any)?.filename || (metadata as any)?.name || selectedFile?.name || 'Document'}
                 </h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-muted-foreground">
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="text-xs text-muted-foreground font-mono">
                     {formatBytes((metadata as any)?.sizeBytes || (metadata as any)?.size || selectedFile?.size || 0)}
                   </span>
                   <span className="text-xs text-muted-foreground">•</span>
@@ -406,7 +441,7 @@ export function DocumentUploader({
                     {(metadata as any)?.mimeType?.split('/').pop() || 'PDF'}
                   </span>
                   <span
-                    className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${getEngineBadgeClass(
+                    className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border shadow-2xs ${getEngineBadgeClass(
                       engine
                     )}`}
                   >
@@ -419,21 +454,21 @@ export function DocumentUploader({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/80 bg-card/60 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all shadow-2xs cursor-pointer"
               >
                 {showPreview ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                 {showPreview ? 'Hide Text' : 'View Text'}
               </button>
               <button
                 onClick={handleCopyText}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/80 bg-card/60 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all shadow-2xs cursor-pointer"
               >
                 {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? 'Copied' : 'Copy'}
               </button>
               <button
                 onClick={handleReset}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-destructive/30 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-all shadow-2xs cursor-pointer"
               >
                 <X className="h-3.5 w-3.5" />
                 Remove
@@ -443,45 +478,76 @@ export function DocumentUploader({
 
           {/* Stats Badges Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="rounded-xl bg-muted/40 border border-border p-3 space-y-1">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                <FileCode className="h-3 w-3" /> Words
+            <div className="rounded-2xl bg-muted/40 border border-border/60 p-3.5 space-y-1 transition-all hover:bg-muted/60">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <FileCode className="h-3.5 w-3.5 text-emerald-500" /> Words
               </span>
-              <p className="text-xl font-bold text-foreground">{wordCount.toLocaleString()}</p>
+              <p className="text-xl font-extrabold text-foreground tracking-tight">{wordCount.toLocaleString()}</p>
             </div>
 
-            <div className="rounded-xl bg-muted/40 border border-border p-3 space-y-1">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                <Layers className="h-3 w-3" /> Characters
+            <div className="rounded-2xl bg-muted/40 border border-border/60 p-3.5 space-y-1 transition-all hover:bg-muted/60">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="h-3.5 w-3.5 text-teal-500" /> Characters
               </span>
-              <p className="text-xl font-bold text-foreground">{characterCount.toLocaleString()}</p>
+              <p className="text-xl font-extrabold text-foreground tracking-tight">{characterCount.toLocaleString()}</p>
             </div>
 
-            <div className="rounded-xl bg-muted/40 border border-border p-3 space-y-1">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                <Clock className="h-3 w-3" /> Reading Time
+            <div className="rounded-2xl bg-muted/40 border border-border/60 p-3.5 space-y-1 transition-all hover:bg-muted/60">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-cyan-500" /> Reading Time
               </span>
-              <p className="text-xl font-bold text-foreground">~{readingTime} min</p>
+              <p className="text-xl font-extrabold text-foreground tracking-tight">~{readingTime} min</p>
             </div>
 
-            <div className="rounded-xl bg-muted/40 border border-border p-3 space-y-1">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                <Sparkles className="h-3 w-3" /> Pages
+            <div className="rounded-2xl bg-muted/40 border border-border/60 p-3.5 space-y-1 transition-all hover:bg-muted/60">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-indigo-500" /> Pages
               </span>
-              <p className="text-xl font-bold text-foreground">
+              <p className="text-xl font-extrabold text-foreground tracking-tight">
                 {pageCount ? `${pageCount} pgs` : '1 doc'}
               </p>
             </div>
           </div>
 
-          {/* Collapsible Text Preview */}
+          {/* Collapsible Text Preview with Search Filter */}
           {showPreview && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-muted-foreground font-medium">
-                <span>Extracted Plain Text Preview</span>
-                <span>{extractionResult.text.length.toLocaleString()} characters</span>
+            <div className="space-y-2.5 pt-2 border-t border-border/50">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground font-semibold">
+                  <span>Extracted Plain Text Preview</span>
+                  <span className="px-2 py-0.5 rounded-full bg-muted text-[11px] font-mono">
+                    {extractionResult.text.length.toLocaleString()} characters
+                  </span>
+                </div>
+
+                {/* Inline Keyword Filter */}
+                <div className="relative flex items-center max-w-xs">
+                  <Search className="absolute left-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search in text..."
+                    className="pl-8 pr-7 py-1 rounded-xl bg-card border border-border/80 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-44 focus:w-56"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
               </div>
-              <div className="relative rounded-xl border border-border bg-muted/30 p-4 max-h-64 overflow-y-auto font-mono text-xs leading-relaxed text-foreground whitespace-pre-wrap select-text">
+
+              {searchQuery && (
+                <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 px-1">
+                  <span className="font-semibold text-foreground">{searchMatchesCount}</span> matches found for &quot;{searchQuery}&quot;
+                </div>
+              )}
+
+              <div className="relative rounded-2xl border border-border/80 bg-muted/25 p-4 max-h-64 overflow-y-auto font-mono text-xs leading-relaxed text-foreground whitespace-pre-wrap select-text shadow-inner">
                 {extractionResult.text.slice(0, 3000)}
                 {extractionResult.text.length > 3000 && (
                   <span className="text-muted-foreground italic block mt-2">

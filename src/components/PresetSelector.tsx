@@ -13,6 +13,7 @@ import {
   DollarSign,
   GraduationCap,
   Briefcase,
+  SlidersHorizontal,
 } from 'lucide-react';
 
 export interface PresetSelectorProps {
@@ -37,6 +38,7 @@ interface PresetOption {
   description: string;
   icon: React.ElementType;
   accentColor: string;
+  densityPercent: string;
 }
 
 interface PersonaOption {
@@ -55,6 +57,7 @@ const PRESET_OPTIONS: PresetOption[] = [
     description: 'Concise bullet points with core thesis & essential takeaways.',
     icon: Zap,
     accentColor: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+    densityPercent: 'w-1/4 bg-amber-500',
   },
   {
     id: 'medium',
@@ -63,7 +66,8 @@ const PRESET_OPTIONS: PresetOption[] = [
     wordCount: 'Executive Synthesis',
     description: 'Structured summary covering context, methodology & strategic insights.',
     icon: Layers,
-    accentColor: 'text-primary bg-primary/10 border-primary/20',
+    accentColor: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
+    densityPercent: 'w-2/4 bg-emerald-500',
   },
   {
     id: 'long',
@@ -72,7 +76,8 @@ const PRESET_OPTIONS: PresetOption[] = [
     wordCount: 'Deep-Dive',
     description: 'Comprehensive analytical breakdown with deep context & risk assessment.',
     icon: BookOpen,
-    accentColor: 'text-violet-500 bg-violet-500/10 border-violet-500/20',
+    accentColor: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
+    densityPercent: 'w-full bg-indigo-500',
   },
 ];
 
@@ -120,16 +125,16 @@ export function PresetSelector({
     <div className={`space-y-4 ${className}`}>
       {/* Persona Specialization Chips */}
       {onPersonaChange && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-500" />
               Domain Persona Focus
             </span>
             <span className="text-[11px] text-muted-foreground">Customized AI analytical lens</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {PERSONA_OPTIONS.map((p) => {
               const isSelected = persona === p.id;
               const Icon = p.icon;
@@ -140,21 +145,23 @@ export function PresetSelector({
                   type="button"
                   disabled={disabled}
                   onClick={() => onPersonaChange(p.id)}
-                  className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                  className={`flex items-center gap-2.5 p-3 rounded-2xl border text-left transition-all duration-200 cursor-pointer ${
                     isSelected
-                      ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/30 shadow-2xs font-semibold'
-                      : 'border-border bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card/90'
+                      ? 'border-emerald-500/80 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-2 ring-emerald-500/20 shadow-xs font-bold'
+                      : 'border-border/80 bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card/90 hover:border-border'
                   } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div
-                    className={`p-1.5 rounded-lg shrink-0 ${
-                      isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                    className={`p-2 rounded-xl shrink-0 transition-colors ${
+                      isSelected
+                        ? 'bg-emerald-500 text-white shadow-xs'
+                        : 'bg-muted/80 text-muted-foreground'
                     }`}
                   >
-                    <Icon className="h-3.5 w-3.5" />
+                    <Icon className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs truncate">{p.label}</div>
+                    <div className="text-xs font-semibold truncate">{p.label}</div>
                     <div className="text-[10px] text-muted-foreground truncate leading-tight font-normal">
                       {p.sublabel}
                     </div>
@@ -184,27 +191,27 @@ export function PresetSelector({
               aria-checked={isSelected}
               disabled={disabled}
               onClick={() => onChange(option.id)}
-              className={`relative flex flex-col items-start p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
+              className={`relative flex flex-col items-start p-4 rounded-2xl border text-left transition-all duration-200 cursor-pointer overflow-hidden ${
                 isSelected
-                  ? 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm'
-                  : 'border-border bg-card/60 hover:border-primary/40 hover:bg-card/90'
+                  ? 'border-emerald-500 bg-emerald-500/5 ring-2 ring-emerald-500/20 shadow-md shadow-emerald-500/5'
+                  : 'border-border/80 bg-card/60 hover:border-emerald-500/40 hover:bg-card/90'
               } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {/* Top Badge & Active Indicator */}
-              <div className="w-full flex items-center justify-between gap-2 mb-2.5">
+              <div className="w-full flex items-center justify-between gap-2 mb-3">
                 <div
-                  className={`p-1.5 rounded-lg border ${
-                    isSelected ? option.accentColor : 'text-muted-foreground bg-muted border-border'
+                  className={`p-2 rounded-xl border ${
+                    isSelected ? option.accentColor : 'text-muted-foreground bg-muted/60 border-border/80'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground font-mono">
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-muted/80 border border-border/80 text-muted-foreground font-mono">
                     {option.badge}
                   </span>
                   {isSelected && (
-                    <div className="p-0.5 rounded-full bg-primary text-primary-foreground">
+                    <div className="p-0.5 rounded-full bg-emerald-500 text-white shadow-2xs">
                       <Check className="h-3 w-3 stroke-[3]" />
                     </div>
                   )}
@@ -212,9 +219,9 @@ export function PresetSelector({
               </div>
 
               {/* Title & Subtitle */}
-              <div className="space-y-1">
+              <div className="space-y-1 w-full">
                 <div className="flex items-center gap-1.5">
-                  <h4 className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                  <h4 className={`text-sm font-bold ${isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
                     {option.name}
                   </h4>
                   <span className="text-xs text-muted-foreground font-medium">• {option.wordCount}</span>
@@ -222,6 +229,11 @@ export function PresetSelector({
                 <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   {option.description}
                 </p>
+              </div>
+
+              {/* Density Bar */}
+              <div className="w-full bg-muted/60 rounded-full h-1 mt-3 overflow-hidden">
+                <div className={`h-1 rounded-full ${option.densityPercent} transition-all duration-300`} />
               </div>
             </button>
           );
@@ -233,10 +245,10 @@ export function PresetSelector({
         <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
           {onExtractKeyPointsChange && (
             <label
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all cursor-pointer select-none ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all cursor-pointer select-none shadow-2xs ${
                 extractKeyPoints
-                  ? 'border-primary/40 bg-primary/10 text-primary font-medium'
-                  : 'border-border bg-card text-muted-foreground hover:border-border/80'
+                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-semibold'
+                  : 'border-border/80 bg-card/60 text-muted-foreground hover:border-border'
               } ${disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
             >
               <input
@@ -244,19 +256,19 @@ export function PresetSelector({
                 checked={extractKeyPoints}
                 onChange={(e) => onExtractKeyPointsChange(e.target.checked)}
                 disabled={disabled}
-                className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                className="rounded border-border text-emerald-600 focus:ring-emerald-500 h-3.5 w-3.5"
               />
-              <Sparkles className="h-3.5 w-3.5" />
+              <Sparkles className="h-3.5 w-3.5 text-emerald-500" />
               <span>Include Key Takeaways</span>
             </label>
           )}
 
           {onExtractSuggestionsChange && (
             <label
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all cursor-pointer select-none ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all cursor-pointer select-none shadow-2xs ${
                 extractSuggestions
-                  ? 'border-primary/40 bg-primary/10 text-primary font-medium'
-                  : 'border-border bg-card text-muted-foreground hover:border-border/80'
+                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-semibold'
+                  : 'border-border/80 bg-card/60 text-muted-foreground hover:border-border'
               } ${disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
             >
               <input
@@ -264,9 +276,9 @@ export function PresetSelector({
                 checked={extractSuggestions}
                 onChange={(e) => onExtractSuggestionsChange(e.target.checked)}
                 disabled={disabled}
-                className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                className="rounded border-border text-emerald-600 focus:ring-emerald-500 h-3.5 w-3.5"
               />
-              <Lightbulb className="h-3.5 w-3.5" />
+              <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
               <span>Include Improvement Suggestions</span>
             </label>
           )}

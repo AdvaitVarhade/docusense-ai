@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, VolumeX, Play, Pause, RotateCcw, FastForward } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface AudioSummaryPlayerProps {
@@ -143,25 +143,31 @@ export function AudioSummaryPlayer({ text, className = '' }: AudioSummaryPlayerP
   }
 
   return (
-    <div className={`inline-flex items-center gap-1.5 p-1 rounded-xl bg-muted/60 border border-border text-xs ${className}`}>
+    <div className={`inline-flex items-center gap-1.5 p-1 rounded-2xl bg-card/80 backdrop-blur-md border border-border/80 text-xs shadow-2xs ${className}`}>
       {isPlaying ? (
         <button
           type="button"
           onClick={handlePause}
           title="Pause Audio Briefing"
-          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all cursor-pointer shadow-xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-500 transition-all cursor-pointer shadow-xs"
         >
           <Pause className="h-3.5 w-3.5" />
           <span>Pause</span>
+          {/* Animated waveform bars */}
+          <span className="flex items-end gap-0.5 h-3.5 ml-0.5">
+            <span className="w-0.5 bg-white rounded-full animate-[bounce_0.8s_infinite] h-2"></span>
+            <span className="w-0.5 bg-white rounded-full animate-[bounce_0.6s_infinite_0.2s] h-3.5"></span>
+            <span className="w-0.5 bg-white rounded-full animate-[bounce_0.9s_infinite_0.4s] h-2.5"></span>
+          </span>
         </button>
       ) : (
         <button
           type="button"
           onClick={handlePlay}
           title="Listen to Summary (Web Speech Audio Briefing)"
-          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 font-medium transition-all cursor-pointer border border-primary/20"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 font-semibold transition-all cursor-pointer border border-emerald-500/20 shadow-2xs"
         >
-          <Volume2 className="h-3.5 w-3.5" />
+          <Volume2 className="h-3.5 w-3.5 text-emerald-500" />
           <span>{isPaused ? 'Resume' : 'Listen'}</span>
         </button>
       )}
@@ -171,7 +177,7 @@ export function AudioSummaryPlayer({ text, className = '' }: AudioSummaryPlayerP
           type="button"
           onClick={handleStop}
           title="Stop Playback"
-          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+          className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
         >
           <VolumeX className="h-3.5 w-3.5" />
         </button>
@@ -181,7 +187,7 @@ export function AudioSummaryPlayer({ text, className = '' }: AudioSummaryPlayerP
         type="button"
         onClick={toggleRate}
         title="Playback Speed"
-        className="px-1.5 py-0.5 rounded-md font-mono text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+        className="px-2 py-1 rounded-xl font-mono text-[11px] font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer border border-transparent hover:border-border/60"
       >
         {playbackRate}x
       </button>
