@@ -8,19 +8,33 @@ import { z } from 'zod';
 export const SummaryPresetSchema = z.enum(['short', 'medium', 'long']);
 export const SummaryPersonaSchema = z.enum(['general', 'legal', 'financial', 'academic']);
 
-export const SummarizeRequestSchema = z.object({
-  text: z
-    .string({ required_error: "Missing or empty 'text' field in request body" })
-    .min(1, { message: "Missing or empty 'text' field in request body" })
-    .refine((val) => val.trim().length > 0, {
-      message: "Missing or empty 'text' field in request body",
-    }),
-  length: SummaryPresetSchema.default('medium').optional(),
-  persona: SummaryPersonaSchema.default('general').optional(),
-  extractKeyPoints: z.boolean().default(true).optional(),
-  extractSuggestions: z.boolean().default(true).optional(),
-  documentMeta: z.record(z.unknown()).optional(),
-});
+export const SummarizeRequestSchema = z
+  .object({
+    text: z.string().optional(),
+    documentText: z.string().optional(),
+    length: SummaryPresetSchema.default('medium').optional(),
+    preset: SummaryPresetSchema.optional(),
+    persona: SummaryPersonaSchema.default('general').optional(),
+    extractKeyPoints: z.boolean().default(true).optional(),
+    extractSuggestions: z.boolean().default(true).optional(),
+    documentMeta: z.record(z.unknown()).optional(),
+    metadata: z.record(z.unknown()).optional(),
+  })
+  .transform((data) => {
+    const rawText = data.text !== undefined ? data.text : data.documentText !== undefined ? data.documentText : '';
+    const resolvedLength = data.length || data.preset || 'medium';
+    const resolvedMeta = data.documentMeta || data.metadata;
+    return {
+      ...data,
+      text: typeof rawText === 'string' ? rawText : '',
+      length: resolvedLength,
+      documentMeta: resolvedMeta,
+    };
+  })
+  .refine((data) => data.text.trim().length > 0, {
+    message: "Missing or empty 'text' field in request body",
+    path: ['text'],
+  });
 
 export const KeyPointSchema = z.object({
   id: z.string(),

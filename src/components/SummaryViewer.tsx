@@ -175,11 +175,14 @@ export function SummaryViewer({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          text: documentText,
           documentText,
+          length: preset,
           preset,
           persona,
           extractKeyPoints,
           extractSuggestions,
+          documentMeta: documentMetadata,
         }),
         signal: abortControllerRef.current.signal,
       });
