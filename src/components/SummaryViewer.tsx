@@ -17,16 +17,20 @@ import {
   ShieldAlert,
   ArrowRight,
 } from 'lucide-react';
-import { SummaryPreset, KeyPoint, ImprovementSuggestion } from '@/domain/models/summary';
+import { SummaryPreset, SummaryPersona, KeyPoint, ImprovementSuggestion } from '@/domain/models/summary';
 import { DocumentMetadata, DocumentMeta } from '@/domain/models/document';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { ExportMenu } from '@/components/ExportMenu';
+import { AudioSummaryPlayer } from '@/components/AudioSummaryPlayer';
+import { DocumentChat } from '@/components/DocumentChat';
+import { HistoryStorage } from '@/components/HistoryVault';
 
 export interface SummaryViewerProps {
   documentText: string;
   documentMetadata?: DocumentMetadata | DocumentMeta;
   preset: SummaryPreset;
+  persona?: SummaryPersona;
   extractKeyPoints?: boolean;
   extractSuggestions?: boolean;
   autoStart?: boolean;
@@ -44,6 +48,7 @@ export function SummaryViewer({
   documentText,
   documentMetadata,
   preset = 'medium',
+  persona = 'general',
   extractKeyPoints = true,
   extractSuggestions = true,
   autoStart = false,
@@ -175,6 +180,7 @@ export function SummaryViewer({
         body: JSON.stringify({
           text: documentText,
           length: preset,
+          persona,
           extractKeyPoints,
           extractSuggestions,
         }),
@@ -239,6 +245,24 @@ export function SummaryViewer({
         keyPoints,
         suggestions,
       });
+
+      // Auto-save to client-side encrypted History Vault
+      const docName =
+        (documentMetadata as any)?.filename ||
+        (documentMetadata as any)?.name ||
+        'Ingested Document';
+
+      HistoryStorage.saveEntry({
+        documentName: docName,
+        documentMeta: documentMetadata || {},
+        documentText,
+        preset,
+        persona,
+        summaryMarkdown: accumulatedText,
+        keyPoints,
+        suggestions,
+      });
+
       const words = accumulatedText.split(/\s+/).filter(Boolean).length;
       toast.success(`Generated ${preset} summary (${words} words)!`);
     } catch (err: unknown) {
@@ -334,6 +358,11 @@ export function SummaryViewer({
               <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">
                 {preset} Mode
               </span>
+              {persona && persona !== 'general' && (
+                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 uppercase tracking-wider">
+                  {persona} Focus
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
               {isStreaming ? (
@@ -372,6 +401,8 @@ export function SummaryViewer({
             </button>
           ) : (
             <>
+              {summaryMarkdown && <AudioSummaryPlayer text={summaryMarkdown} />}
+
               {summaryMarkdown && (
                 <ExportMenu
                   summaryMarkdown={summaryMarkdown}
@@ -654,6 +685,20 @@ export function SummaryViewer({
             )}
           </TabsContent>
         </Tabs>
+      )}
+
+      {/* Interactive Document Q&A Assistant */}
+      {documentText && documentText.trim().length > 0 && (
+        <div className="pt-2 border-t border-border">
+          <DocumentChat
+            documentText={documentText}
+            documentName={
+              (documentMetadata as any)?.filename ||
+              (documentMetadata as any)?.name ||
+              'Ingested Document'
+            }
+          />
+        </div>
       )}
     </div>
   );

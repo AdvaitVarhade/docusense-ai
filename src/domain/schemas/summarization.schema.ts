@@ -6,6 +6,7 @@
 import { z } from 'zod';
 
 export const SummaryPresetSchema = z.enum(['short', 'medium', 'long']);
+export const SummaryPersonaSchema = z.enum(['general', 'legal', 'financial', 'academic']);
 
 export const SummarizeRequestSchema = z.object({
   text: z
@@ -15,6 +16,7 @@ export const SummarizeRequestSchema = z.object({
       message: "Missing or empty 'text' field in request body",
     }),
   length: SummaryPresetSchema.default('medium').optional(),
+  persona: SummaryPersonaSchema.default('general').optional(),
   extractKeyPoints: z.boolean().default(true).optional(),
   extractSuggestions: z.boolean().default(true).optional(),
   documentMeta: z.record(z.unknown()).optional(),

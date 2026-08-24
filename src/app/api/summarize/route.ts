@@ -53,6 +53,7 @@ export async function POST(request: NextRequest | Request): Promise<Response> {
     const {
       text,
       length = 'medium',
+      persona = 'general',
       extractKeyPoints = true,
       extractSuggestions = true,
       documentMeta,
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest | Request): Promise<Response> {
     const stream = await summarizeDocumentUseCase.executeStream({
       text,
       preset: length,
+      persona,
       extractKeyPoints,
       extractSuggestions,
       meta: documentMeta as any,

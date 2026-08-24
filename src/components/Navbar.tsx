@@ -7,15 +7,17 @@ import {
   Moon,
   Sun,
   FileCheck,
+  History,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 export interface NavbarProps {
   onResetAll?: () => void;
+  onOpenHistory?: () => void;
   hasActiveDocument?: boolean;
 }
 
-export function Navbar({ onResetAll, hasActiveDocument = false }: NavbarProps) {
+export function Navbar({ onResetAll, onOpenHistory, hasActiveDocument = false }: NavbarProps) {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -65,11 +67,23 @@ export function Navbar({ onResetAll, hasActiveDocument = false }: NavbarProps) {
             <span>Multi-Tier OCR Active</span>
           </div>
 
+          {/* History Vault Trigger */}
+          {onOpenHistory && (
+            <button
+              onClick={onOpenHistory}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              title="Open Local History Vault"
+            >
+              <History className="h-3.5 w-3.5 text-primary" />
+              <span className="hidden sm:inline">History</span>
+            </button>
+          )}
+
           {/* Reset App State Trigger (if document loaded) */}
           {hasActiveDocument && onResetAll && (
             <button
               onClick={onResetAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
               title="Reset current session"
             >
               <RotateCcw className="h-3.5 w-3.5" />
@@ -81,7 +95,7 @@ export function Navbar({ onResetAll, hasActiveDocument = false }: NavbarProps) {
           {mounted && (
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
               aria-label="Toggle color theme"
               title="Toggle theme"
             >
@@ -91,13 +105,13 @@ export function Navbar({ onResetAll, hasActiveDocument = false }: NavbarProps) {
 
           {/* Docs / PRD Badge */}
           <a
-            href="/docs/prd/PRD-Document-Summary-Assistant.md"
+            href="https://github.com/AdvaitVarhade/docusense-ai"
             target="_blank"
             rel="noreferrer"
             className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <FileCheck className="h-3.5 w-3.5" />
-            <span>PRD</span>
+            <span>GitHub</span>
           </a>
         </div>
       </div>

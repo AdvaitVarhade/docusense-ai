@@ -6,6 +6,14 @@
 import { DocumentMetadata, DocumentMeta } from './document';
 
 export type SummaryPreset = 'short' | 'medium' | 'long';
+export type SummaryPersona = 'general' | 'legal' | 'financial' | 'academic';
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: string;
+}
 
 export interface KeyPoint {
   id: string;
@@ -25,6 +33,7 @@ export interface ImprovementSuggestion {
 export interface DocumentAnalysisResult {
   documentMeta?: Partial<DocumentMetadata> | DocumentMeta;
   preset: SummaryPreset;
+  persona?: SummaryPersona;
   summaryMarkdown: string;
   keyPoints: KeyPoint[];
   suggestions: ImprovementSuggestion[];
@@ -34,6 +43,7 @@ export interface DocumentAnalysisResult {
 export interface SummarizationInput {
   text: string;
   length?: SummaryPreset;
+  persona?: SummaryPersona;
   extractKeyPoints?: boolean;
   extractSuggestions?: boolean;
   documentMeta?: Partial<DocumentMetadata> | DocumentMeta;

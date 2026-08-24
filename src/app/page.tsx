@@ -5,8 +5,10 @@ import { Navbar } from '@/components/Navbar';
 import { DocumentUploader } from '@/components/DocumentUploader';
 import { PresetSelector } from '@/components/PresetSelector';
 import { SummaryViewer } from '@/components/SummaryViewer';
+import { HistoryVault } from '@/components/HistoryVault';
 import { ExtractionResult } from '@/domain/models/document';
-import { SummaryPreset, KeyPoint, ImprovementSuggestion } from '@/domain/models/summary';
+import { SummaryPreset, SummaryPersona, KeyPoint, ImprovementSuggestion } from '@/domain/models/summary';
+import { HistoryEntry } from '@/domain/models/history';
 import {
   FileText,
   Zap,
@@ -17,8 +19,10 @@ import {
 export default function HomePage() {
   const [extractionResult, setExtractionResult] = useState<ExtractionResult | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<SummaryPreset>('medium');
+  const [selectedPersona, setSelectedPersona] = useState<SummaryPersona>('general');
   const [extractKeyPoints, setExtractKeyPoints] = useState<boolean>(true);
   const [extractSuggestions, setExtractSuggestions] = useState<boolean>(true);
+  const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
   const [, setSummaryData] = useState<{
     summaryMarkdown: string;
     keyPoints: KeyPoint[];
@@ -43,10 +47,32 @@ export default function HomePage() {
     setSummaryData(result);
   };
 
+  const handleRestoreHistoryEntry = (entry: HistoryEntry) => {
+    setExtractionResult({
+      success: true,
+      text: entry.documentText,
+      metadata: entry.documentMeta as any,
+      meta: entry.documentMeta as any,
+    });
+    setSelectedPreset(entry.preset);
+    if (entry.persona) {
+      setSelectedPersona(entry.persona);
+    }
+    setSummaryData({
+      summaryMarkdown: entry.summaryMarkdown,
+      keyPoints: entry.keyPoints,
+      suggestions: entry.suggestions,
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
       {/* Top Navigation Bar */}
-      <Navbar onResetAll={handleResetAll} hasActiveDocument={!!extractionResult} />
+      <Navbar
+        onResetAll={handleResetAll}
+        onOpenHistory={() => setIsHistoryOpen(true)}
+        hasActiveDocument={!!extractionResult}
+      />
 
       {/* Main Dashboard Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
@@ -84,11 +110,11 @@ export default function HomePage() {
 
             {extractionResult ? (
               <div className="space-y-6 animate-in fade-in duration-300">
-                {/* Length Preset Selector & Feature Toggles */}
-                <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-sm">
+                {/* Length Preset & Persona Selector */}
+                <div className="rounded-2xl border border-border bg-card p-5 space-y-4 shadow-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Configure Summary Fidelity
+                      Configure Summary Fidelity & Persona
                     </span>
                     <span className="text-xs font-medium text-primary">
                       {selectedPreset === 'short'
@@ -101,6 +127,8 @@ export default function HomePage() {
                   <PresetSelector
                     value={selectedPreset}
                     onChange={setSelectedPreset}
+                    persona={selectedPersona}
+                    onPersonaChange={setSelectedPersona}
                     extractKeyPoints={extractKeyPoints}
                     onExtractKeyPointsChange={setExtractKeyPoints}
                     extractSuggestions={extractSuggestions}
@@ -113,6 +141,7 @@ export default function HomePage() {
                   documentText={extractionResult.text}
                   documentMetadata={extractionResult.metadata || extractionResult.meta}
                   preset={selectedPreset}
+                  persona={selectedPersona}
                   extractKeyPoints={extractKeyPoints}
                   extractSuggestions={extractSuggestions}
                   onSummaryComplete={handleSummaryComplete}
@@ -135,6 +164,13 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+
+      {/* Local History Vault Sheet / Modal */}
+      <HistoryVault
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        onRestoreEntry={handleRestoreHistoryEntry}
+      />
 
       {/* Footer */}
       <footer className="border-t border-border bg-card/30 py-6 text-center text-xs text-muted-foreground space-y-1">

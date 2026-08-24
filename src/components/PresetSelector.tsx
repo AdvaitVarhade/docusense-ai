@@ -1,12 +1,25 @@
 'use client';
 
 import React from 'react';
-import { SummaryPreset } from '@/domain/models/summary';
-import { Zap, Layers, BookOpen, Check, Sparkles, Lightbulb } from 'lucide-react';
+import { SummaryPreset, SummaryPersona } from '@/domain/models/summary';
+import {
+  Zap,
+  Layers,
+  BookOpen,
+  Check,
+  Sparkles,
+  Lightbulb,
+  Scale,
+  DollarSign,
+  GraduationCap,
+  Briefcase,
+} from 'lucide-react';
 
 export interface PresetSelectorProps {
   value: SummaryPreset;
   onChange: (preset: SummaryPreset) => void;
+  persona?: SummaryPersona;
+  onPersonaChange?: (persona: SummaryPersona) => void;
   disabled?: boolean;
   className?: string;
   extractKeyPoints?: boolean;
@@ -24,6 +37,13 @@ interface PresetOption {
   description: string;
   icon: React.ElementType;
   accentColor: string;
+}
+
+interface PersonaOption {
+  id: SummaryPersona;
+  label: string;
+  sublabel: string;
+  icon: React.ElementType;
 }
 
 const PRESET_OPTIONS: PresetOption[] = [
@@ -56,9 +76,38 @@ const PRESET_OPTIONS: PresetOption[] = [
   },
 ];
 
+const PERSONA_OPTIONS: PersonaOption[] = [
+  {
+    id: 'general',
+    label: 'Executive',
+    sublabel: 'Strategic & General',
+    icon: Briefcase,
+  },
+  {
+    id: 'legal',
+    label: 'Legal',
+    sublabel: 'Contracts & Liabilities',
+    icon: Scale,
+  },
+  {
+    id: 'financial',
+    label: 'Financial',
+    sublabel: 'Earnings & Quantitative',
+    icon: DollarSign,
+  },
+  {
+    id: 'academic',
+    label: 'Academic',
+    sublabel: 'Research & Methodology',
+    icon: GraduationCap,
+  },
+];
+
 export function PresetSelector({
   value,
   onChange,
+  persona = 'general',
+  onPersonaChange,
   disabled = false,
   className = '',
   extractKeyPoints = true,
@@ -69,6 +118,54 @@ export function PresetSelector({
 }: PresetSelectorProps) {
   return (
     <div className={`space-y-4 ${className}`}>
+      {/* Persona Specialization Chips */}
+      {onPersonaChange && (
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              Domain Persona Focus
+            </span>
+            <span className="text-[11px] text-muted-foreground">Customized AI analytical lens</span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {PERSONA_OPTIONS.map((p) => {
+              const isSelected = persona === p.id;
+              const Icon = p.icon;
+
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => onPersonaChange(p.id)}
+                  className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                    isSelected
+                      ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/30 shadow-2xs font-semibold'
+                      : 'border-border bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card/90'
+                  } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div
+                    className={`p-1.5 rounded-lg shrink-0 ${
+                      isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs truncate">{p.label}</div>
+                    <div className="text-[10px] text-muted-foreground truncate leading-tight font-normal">
+                      {p.sublabel}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Preset Cards Grid */}
       <div
         role="radiogroup"
