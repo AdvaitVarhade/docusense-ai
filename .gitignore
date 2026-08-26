@@ -45,9 +45,9 @@ Thumbs.db
 *.sln
 *.sw?
 
-# Agent metadata
-.agents/*
-!.agents/
+# Agent metadata & local skills
+.agents/
+
 
 # Temporary test artifacts
 tests/fixtures/temp_*
